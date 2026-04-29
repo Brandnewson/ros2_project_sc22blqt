@@ -18,15 +18,14 @@ class colourIdentifier(Node):
     def __init__(self):
         super().__init__('cI')
         # Initialise any flags that signal a colour has been detected (default to false)
-
+        self.green_detected = False
         # Initialise the value you wish to use for sensitivity in the colour detection (10 should be enough)
-
+        self.sensitivity = 10
         # Remember to initialise a CvBridge() and set up a subscriber to the image topic you wish to use
         # We covered which topic to subscribe to should you wish to receive image data
         self.bridge = CvBridge()
         self.subscription = self.create_subscription(Image, '/camera/image_raw', self.callback, 10)
         self.subscription  # prevent unused variable warning
-        
 
 
     def callback(self, data):
@@ -51,11 +50,11 @@ class colourIdentifier(Node):
         # Filter out everything but a particular colour using the cv2.inRange() method
 
         # Apply the mask to the original image using the cv2.bitwise_and() method
-
-
+        green_mask = cv2.inRange(Hsv_image, hsv_green_lower, hsv_green_upper)
+        green_only = cv2.bitwise_and(image, image, mask=green_mask)
         # Find the contours that appear within the certain colour mask using the cv2.findContours() method
         # For <mode> use cv2.RETR_LIST for <method> use cv2.CHAIN_APPROX_SIMPLE
-
+        contours, _ = cv2.findContours(green_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         if len(contours) > 0:
             # Loop over the contours
             # There are a few different methods for identifying which contour is the biggest:
@@ -65,27 +64,32 @@ class colourIdentifier(Node):
 
             #Moments can calculate the center of the contour
             M = cv2.moments(c)
-            cx, cy = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
+            if M['m00'] > 0:
+                cx, cy = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
 
             #Check if the area of the shape you want is big enough to be considered
             # If it is then change the flag for that colour to be True(1)
-            if cv2.contourArea(c) > x: #<What do you think is a suitable area?>
-
+            if cv2.contourArea(c) > 500: #<What do you think is a suitable area?>
+                self.green_detected = True
                 # draw a circle on the contour you're identifying
                 #minEnclosingCircle can find the centre and radius of the largest contour(result from max())
                 (x, y), radius = cv2.minEnclosingCircle(c)
-
-                cv2.circle(image,(center_x,center_y),radius,colour,thickness)
+                center = (int(x), int(y))
+                cv2.circle(image, (int(x), int(y)), int(radius), (0, 255, 0), 2)
 
                 # Then alter the values of any flags
-
+            else:
+                self.green_detected = False
 
         #if the flag is true (colour has been detected)
             #print the flag or colour to test that it has been detected
             #alternatively you could publish to the lab1 talker/listener
-
+        if self.green_detected:
+            self.get_logger().info('Green object detected!')
         #Show the resultant images you have created. You can show all of them or just the end result if you wish to.
-
+        cv2.imshow('Green Mask', green_mask)
+        cv2.imshow('Detected Object', image)
+        cv2.waitKey(3)
 # Create a node of your class in the main and ensure it stays up and running
 # handling exceptions and such
 def main():
@@ -116,3 +120,4 @@ def main():
 # Check if the node is executing in the main path
 if __name__ == '__main__':
     main()
+
