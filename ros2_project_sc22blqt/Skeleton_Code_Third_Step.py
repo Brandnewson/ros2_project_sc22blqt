@@ -12,8 +12,6 @@ from cv_bridge import CvBridge, CvBridgeError
 from rclpy.exceptions import ROSInterruptException
 import signal
 
-
-
 class colourIdentifier(Node):
     def __init__(self):
         super().__init__('cI')
@@ -26,8 +24,6 @@ class colourIdentifier(Node):
         self.bridge = CvBridge()
         self.subscription = self.create_subscription(Image, '/camera/image_raw', self.callback, 10)
         self.subscription  # prevent unused variable warning
-        
-
 
     def callback(self, data):
 
@@ -45,17 +41,26 @@ class colourIdentifier(Node):
         # Set the upper and lower bounds for the colour you wish to identify - green
         hsv_green_lower = np.array([60 - self.sensitivity, 100, 100])
         hsv_green_upper = np.array([60 + self.sensitivity, 255, 255])
+        hsv_blue_lower  = np.array([120 - self.sensitivity, 100, 100])
+        hsv_blue_upper  = np.array([120 + self.sensitivity, 255, 255])
+
         # Convert the rgb image into a hsv image
         Hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
         # Filter out everything but a particular colour using the cv2.inRange() method
-
+        green_mask = cv2.inRange(Hsv_image, hsv_green_lower, hsv_green_upper)
+        blue_mask  = cv2.inRange(Hsv_image, hsv_blue_lower,  hsv_blue_upper)
         # Apply the mask to the original image using the cv2.bitwise_and() method
-
+        green_only = cv2.bitwise_and(image, image, mask=green_mask)
+        blue_only = cv2.bitwise_and(image, image, mask=blue_mask)
+        cv2.imshow('Green', green_only)
+        cv2.imshow('Blue', blue_only)
 
         # Find the contours that appear within the certain colour mask using the cv2.findContours() method
         # For <mode> use cv2.RETR_LIST for <method> use cv2.CHAIN_APPROX_SIMPLE
-
+        green_contours, _ = cv2.findContours(green_mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        blue_contours, _  = cv2.findContours(blue_mask,  cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        
         if len(contours) > 0:
             # Loop over the contours
             # There are a few different methods for identifying which contour is the biggest:
