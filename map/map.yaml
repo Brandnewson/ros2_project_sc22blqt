@@ -1,7 +1,7 @@
-image: map.pgm
+image: /uolstore/home/users/sc22blqt/ros2_ws/src/ros2_project_sc22blqt/map/map.pgm
 mode: trinary
 resolution: 0.05
-origin: [-12.2, -15.8, 0]
+origin: [-11.5, -14.6, 0]
 negate: 0
 occupied_thresh: 0.65
 free_thresh: 0.25
