@@ -1,3 +1,4 @@
+from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'ros2_project_sc22blqt'
@@ -10,12 +11,13 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/map', glob('map/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='cscajb',
     maintainer_email='x.wang16@leeds.ac.uk',
-    description='TODO: Package description',
+    description='ROS 2 project package for navigation and RGB object detection',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={

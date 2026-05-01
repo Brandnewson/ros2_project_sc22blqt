@@ -3,9 +3,15 @@
 <package format="3">
   <name>ros2_project_sc22blqt</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>ROS 2 project package for navigation and RGB object detection</description>
   <maintainer email="x.wang16@leeds.ac.uk">cscajb</maintainer>
   <license>TODO: License declaration</license>
+
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav2_msgs</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

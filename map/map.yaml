@@ -1,4 +1,4 @@
-image: /uolstore/home/users/sc22blqt/ros2_ws/src/ros2_project_sc22blqt/map/map.pgm
+image: map.pgm
 mode: trinary
 resolution: 0.05
 origin: [-11.5, -14.6, 0]
